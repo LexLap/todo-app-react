@@ -5,7 +5,12 @@ const NewTaskModal = (props) => {
     const [textAreaTempInput, setTextAreaTempInput] = useState('')
 
     return(
-        <div id='new-task-modal-container'>
+        <div id='new-task-modal-container'
+            onClick={ (event)=> {
+                if(event.target.id==='new-task-modal-container')
+                    props.setNewTaskMode(false)
+            }}
+        >
             <div id='new-task-modal-screen'>
                 <div id='text-area-wrapper'>
                     <textarea
@@ -17,10 +22,13 @@ const NewTaskModal = (props) => {
                         }}
                     ></textarea>
                 </div>
-                <div id='create-button'
+                <div id='new-task-button-container'
                     onClick={()=>{
                         createTask(textAreaTempInput).then((data)=>{
-                            props.setInitStart(true)
+                            if(data){
+                                props.tasksData.push(data)
+                                props.setTasksData(props.tasksData)
+                            }
                             props.setNewTaskMode(false)
                         })
                     }}

@@ -7,53 +7,87 @@ export const createTask = async (data) =>{
         const result = await Axios.put(url+'/create-new-task', {
             content: data
         })
-        console.log(result)
-    } catch (error) {
-        console.log(error)
+
+        return result.data
+    } catch (error){
+        if (error.response && error.response.status === 500) {
+            console.log(error.response.data.message.message)
+            alert(error.response.data.message.message)
+        }else alert('Unable to create task.\nNo connection with the server!')
+        return undefined
     }
 }
 
 export const getTasks = async () =>{
     try {
         const result = await Axios.get(url+'/get-tasks')
-        console.log(result)
         return result.data
-    } catch (error) {
-        console.log(error)
+    } catch (error){
+        if (error.response && error.response.status === 500) {
+            console.log(error.response.data.message.message)
+            alert(error.response.data.message.message)
+        }else alert('Unable to get tasks.\nNo connection with the server!')
+        return []
     }
 }
 
 export const deleteTask = async (taskID) =>{
     try {
-        console.log(taskID)
-        const result = await Axios.delete(url+'/delete-task', {
+        await Axios.delete(url+'/delete-task', {
             data: {id: taskID}
         })
-        console.log(result)
-    } catch (error) {
-        console.log(error)
-        
+
+        return true
+    } catch (error){
+        if (error.response && error.response.status === 500) {
+            console.log(error.response.data.message.message)
+            alert(error.response.data.message.message)
+        }else alert('Unable to delete task.\nNo connection with the server!')
+        return false
     }
 }
 
 export const updateTask = async (taskID) =>{
     try {
-        console.log(taskID)
-        const result = await Axios.patch(url+'/update-task', {
+        await Axios.patch(url+'/update-task', {
             id: taskID
         })
-        console.log(result)
-    } catch (error) {
-        console.log(error)
-        
+
+        return true
+    } catch (error){
+        if (error.response && error.response.status === 500) {
+            console.log(error.response.data.message.message)
+            alert(error.response.data.message.message)
+        }else alert('Unable to update task.\nNo connection with the server!')
+        return false
     }
 }
 
 export const countActiveTasks = (tasksData) =>{
+    if(tasksData){
+        let activesCounter = 0
+        tasksData.forEach(element => {
+            if(!element.statusIsCompleted) activesCounter++ 
+        })
+        return activesCounter
+    }else return 0
+}
 
-    let activesCounter = 0
+export const removeTaskLocally = (tasksData, taskID) =>{
+    const newArray = []
+
     tasksData.forEach(element => {
-        if(!element.statusIsCompleted) activesCounter++ 
-    });
-    return activesCounter
+        if(element._id !== taskID) newArray.push(element) 
+    })
+    return newArray
+}
+
+export const updateTaskLocally = (tasksData, taskID) =>{
+    const newArray = []
+
+    tasksData.forEach(element => {
+        if(element._id === taskID) element.statusIsCompleted = !element.statusIsCompleted
+        newArray.push(element) 
+    })
+    return newArray
 }

@@ -1,7 +1,8 @@
 import React from 'react';
-import { deleteTask, updateTask } from '../server/TaskManager';
+import { deleteTask, removeTaskLocally, updateTask, updateTaskLocally } from '../server/TaskManager';
 
 const TaskCard = (props) => {
+    const tasksData = props.tasksData
     const taskID = props.taskData._id
     const statusIsCompleted = props.taskData.statusIsCompleted
 
@@ -11,14 +12,19 @@ const TaskCard = (props) => {
             <div className='card-content'>
                 {props.taskData.content}
             </div>
-            <div>
-                Completed
+            <div className='status-wrapper'>
+                <label className='completed-label' htmlFor={taskID}>Completed</label>
                 <input
+                    id={taskID}
                     checked={statusIsCompleted}
                     type='checkbox'
                     onChange={()=>{
-                        updateTask(taskID).then(()=>{
-                            props.setInitStart(true)
+                        updateTask(taskID).then((result)=>{
+                            if(result){
+                                props.setTasksData(
+                                    updateTaskLocally(tasksData, taskID)
+                                )
+                            }
                         })
                     }}
                 >
@@ -26,8 +32,12 @@ const TaskCard = (props) => {
             </div>
             <div className='delete-task-button'
                 onClick={()=>{
-                    deleteTask(taskID).then(()=>{
-                        props.setInitStart(true)
+                    deleteTask(taskID).then((result)=>{
+                        if(result){
+                            props.setTasksData(
+                                removeTaskLocally(tasksData, taskID)
+                            )
+                        }
                     })
                 }}
             >

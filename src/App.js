@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Header from "./components/Header";
 import NewTaskModal from "./components/NewTaskModal";
 import TaskCard from "./components/TaskCard";
@@ -7,21 +7,21 @@ import { countActiveTasks, getTasks } from "./server/TaskManager";
 function App() {
   const [ newTaskMode, setNewTaskMode ] = useState(false)
   const [ tasksData, setTasksData ] = useState([])
-  const [ initStart, setInitStart ] = useState(true)
   
   const activeTasksCounter = countActiveTasks(tasksData)
 
-  if(initStart)getTasks()
+  useEffect(() => {
+    getTasks()
       .then(data => {
-        setInitStart(false)
         setTasksData(data);
       });
+  }, []);
 
   let tasksContent = <div></div>
   if(tasksData.length > 0){
     tasksContent = 
     tasksData.map((taskData, i)=>{
-      return <TaskCard key={i} className='task-wrapper' setInitStart={setInitStart} taskData={taskData}/>
+      return <TaskCard key={i} className='task-wrapper' tasksData={tasksData} setTasksData={setTasksData} taskData={taskData}/>
   })}
   
   return (
@@ -34,7 +34,7 @@ function App() {
 
       {
         !!newTaskMode&&
-        <NewTaskModal setInitStart={setInitStart} setNewTaskMode={setNewTaskMode}/>
+        <NewTaskModal tasksData={tasksData} setTasksData={setTasksData} setNewTaskMode={setNewTaskMode}/>
       }
     </div>
   );
